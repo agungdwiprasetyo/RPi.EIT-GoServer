@@ -8,12 +8,17 @@ $ go get github.com/go-sql-driver/mysql
 $ go get github.com/googollee/go-socket.io
 ```
 
-Build main program:
+Run program:
+```sh
+$ go run main.go
+```
+
+Or build main program:
 ```sh
 $ go build main.go
 ```
 
-Run server at port 3000:
+Run server at port 3456:
 ```sh
 $ ./main
 ```

@@ -11,18 +11,29 @@ func GetAlgor(c *gin.Context){
 		algor  Algor
 		allAlgor []Algor
 	)
+
 	rows, err := conn.Query("select id_algor,nama_algor from algoritma;")
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "ops, ada kesalahan saat query data",
+		})
 		fmt.Print(err.Error())
+		return
 	}
+
 	for rows.Next() {
 		err = rows.Scan(&algor.Id_algor, &algor.Nama)
 		allAlgor = append(allAlgor, algor)
 		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "ops, ada kesalahan saat fetch data",
+			})
 			fmt.Print(err.Error())
+			return
 		}
 	}
 	defer rows.Close()
+
 	c.JSON(http.StatusOK, gin.H{
 		"result": allAlgor,
 		"count":  len(allAlgor),
@@ -30,22 +41,74 @@ func GetAlgor(c *gin.Context){
 }
 
 func PostAlgor(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"status": 1,
-		"message": "tes post algor ok gan",
+	namaAlgor := c.PostForm("nama_algor")
+	idAlgor := c.PostForm("id_algor")
+
+	if namaAlgor == "" || idAlgor == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "tidak ada parameter yang dikirim",
+		})
+		return
+	}
+
+	masuk, err := conn.Prepare("insert into algoritma (id_algor,nama_algor) values(?,?);")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "ops, ada kesalahan saat query data",
+		})
+		fmt.Print(err.Error())
+		return
+	}
+
+	_, err = masuk.Exec(idAlgor, namaAlgor)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "ops, ada kesalahan saat eksekusi query",
+		})
+		fmt.Print(err.Error())
+		return
+	}
+	defer masuk.Close()
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "sukses tambah jenis algoritma baru",
 	})
 }
 
 func PutAlgor(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"status": 1,
 		"message": "tes put algor ok gan",
 	})
 }
 
 func DeleteAlgor(c *gin.Context) {
+	idAlgor := c.Param("id")
+	if idAlgor == "" {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "tidak ada parameter yang dikirim",
+		})
+		return
+	}
+
+	dlt, err := conn.Prepare("delete from algoritma where id_algor=?;")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "ops, ada kesalahan saat query data",
+		})
+		fmt.Print(err.Error())
+		return
+	}
+
+	_, err = dlt.Exec(idAlgor)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "ops, ada kesalahan saat eksekusi query",
+		})
+		fmt.Print(err.Error())
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"status": 1,
-		"message": "tes delete algor ok gan",
+		"message": "delete jenis algoritma sukses gan",
 	})
 }

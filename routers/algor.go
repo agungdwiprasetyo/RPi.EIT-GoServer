@@ -18,7 +18,7 @@ func Algor(router *gin.Engine){
 		models.PutAlgor(c)
 	})
 
-	router.DELETE("/algor", func(c *gin.Context) {
+	router.DELETE("/algor/:id", func(c *gin.Context) {
 		models.DeleteAlgor(c)
 	})
 }

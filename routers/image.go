@@ -18,7 +18,7 @@ func Image(router *gin.Engine){
 		models.PutImage(c)
 	})
 
-	router.DELETE("/image", func(c *gin.Context) {
+	router.DELETE("/image/:id", func(c *gin.Context) {
 		models.DeleteImage(c)
 	})
 }

@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	// "github.com/jinzhu/gorm"
 )
 
 type (
@@ -15,7 +16,7 @@ type (
 
 	Data struct {
 		Id_data int `json:"id_data,omitempty"`
-		Nama string `json:"nama,omitempty"`
+		Nama string `json:"nama_data,omitempty"`
 		Filename string `json:"filename,omitempty"`
 		Deskripsi string `json:"deskripsi,omitempty"`
 		Model string `json:"model,omitempty"`

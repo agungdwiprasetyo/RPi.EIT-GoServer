@@ -18,7 +18,7 @@ func Data(router *gin.Engine){
 		models.PutData(c)
 	})
 
-	router.DELETE("/data", func(c *gin.Context) {
+	router.DELETE("/data/:id", func(c *gin.Context) {
 		models.DeleteData(c)
 	})
 }

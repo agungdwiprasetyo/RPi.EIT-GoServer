@@ -11,18 +11,29 @@ func GetImage(c *gin.Context){
 		image  Image
 		images []Image
 	)
+
 	rows, err := conn.Query("select * from image;")
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "ops, ada kesalahan saat query data",
+		})
 		fmt.Print(err.Error())
+		return
 	}
+
 	for rows.Next() {
 		err = rows.Scan(&image.Nama, &image.Id_data, &image.Id_algor, &image.Kerapatan, &image.Datetime)
 		images = append(images, image)
 		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "ops, ada kesalahan saat fetch data",
+			})
 			fmt.Print(err.Error())
+			return
 		}
 	}
 	defer rows.Close()
+	
 	c.JSON(http.StatusOK, gin.H{
 		"result": images,
 		"count":  len(images),
@@ -35,22 +46,33 @@ func PostImage(c *gin.Context) {
 	idAlgor := c.PostForm("id_algor")
 	kerapatan := c.PostForm("kerapatan")
 
+	if nama == "" || kerapatan == "" || idData=="" || idAlgor=="" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "tidak ada parameter yang dikirim",
+		})
+		return
+	}
+
 	masuk, err := conn.Prepare("insert into image (nama, id_data, id_algor, kerapatan) values(?,?,?,?);")
 	if err != nil {
-		fmt.Print(err.Error())
-	}
-	_, err = masuk.Exec(nama, idData, idAlgor, kerapatan)
-
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"status": 0,
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "ops, ada kesalahan saat query data",
 		})
 		fmt.Print(err.Error())
+		return
+	}
+
+	_, err = masuk.Exec(nama, idData, idAlgor, kerapatan)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "ops, ada kesalahan saat eksekusi query",
+		})
+		fmt.Print(err.Error())
+		return
 	}
 	defer masuk.Close()
 
-	c.JSON(http.StatusOK, gin.H{
-		"status": 1,
+	c.JSON(http.StatusCreated, gin.H{
 		"message": "sukses tambah gambar",
 	})
 }
@@ -59,37 +81,65 @@ func PutImage(c *gin.Context) {
 	nama := c.PostForm("filename")
 	kerapatan := c.PostForm("kerapatan")
 
+	if nama == "" || kerapatan == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "tidak ada parameter yang dikirim",
+		})
+		return
+	}
+
 	updt, err := conn.Prepare("update image set kerapatan=? where nama=?;")
 	if err != nil {
-		fmt.Print(err.Error())
-	}
-	_, err = updt.Exec(kerapatan, nama)
-
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"status": 0,
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "ops, ada kesalahan saat query data",
 		})
 		fmt.Print(err.Error())
+		return
+	}
+
+	_, err = updt.Exec(kerapatan, nama)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "ops, ada kesalahan saat eksekusi query",
+		})
+		fmt.Print(err.Error())
+		return
 	}
 	defer updt.Close()
+
 	c.JSON(http.StatusOK, gin.H{
-		"status": 1,
 		"message": "sukses update kerapatan image",
 	})
 }
 
 func DeleteImage(c *gin.Context) {
-	nama := c.Query("nama")
-	dlt, err := conn.Prepare("delete from image where nama= ?;")
-	if err != nil {
-		fmt.Print(err.Error())
+	nama := c.Param("id")
+	if nama == "" {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "tidak ada parameter yang dikirim",
+		})
+		return
 	}
+
+	dlt, err := conn.Prepare("delete from image where nama=?;")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "ops, ada kesalahan saat query data",
+		})
+		fmt.Print(err.Error())
+		return
+	}
+
 	_, err = dlt.Exec(nama)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "ops, ada kesalahan saat eksekusi query",
+		})
 		fmt.Print(err.Error())
+		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"status": 1,
-		"message": "delete image ok gan",
+		"message": "delete image sukses gan",
 	})
 }

@@ -12,7 +12,7 @@ func GetImage(c *gin.Context){
 		images []Image
 	)
 
-	rows, err := conn.Query("select * from image;")
+	rows, err := db.Query("select * from image;")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "ops, ada kesalahan saat query data",
@@ -34,10 +34,7 @@ func GetImage(c *gin.Context){
 	}
 	defer rows.Close()
 	
-	c.JSON(http.StatusOK, gin.H{
-		"result": images,
-		"count":  len(images),
-	})
+	c.JSON(http.StatusOK, images)
 }
 
 func PostImage(c *gin.Context) {
@@ -53,7 +50,7 @@ func PostImage(c *gin.Context) {
 		return
 	}
 
-	masuk, err := conn.Prepare("insert into image (nama, id_data, id_algor, kerapatan) values(?,?,?,?);")
+	masuk, err := db.Prepare("insert into image (nama, id_data, id_algor, kerapatan) values(?,?,?,?);")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "ops, ada kesalahan saat query data",
@@ -88,7 +85,7 @@ func PutImage(c *gin.Context) {
 		return
 	}
 
-	updt, err := conn.Prepare("update image set kerapatan=? where nama=?;")
+	updt, err := db.Prepare("update image set kerapatan=? where nama=?;")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "ops, ada kesalahan saat query data",
@@ -121,7 +118,7 @@ func DeleteImage(c *gin.Context) {
 		return
 	}
 
-	dlt, err := conn.Prepare("delete from image where nama=?;")
+	dlt, err := db.Prepare("delete from image where nama=?;")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "ops, ada kesalahan saat query data",

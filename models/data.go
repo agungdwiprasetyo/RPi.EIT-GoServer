@@ -12,7 +12,7 @@ func GetData(c *gin.Context){
 		alldata []Data
 	)
 
-	rows, err := conn.Query("select * from data_ukur;")
+	rows, err := db.Query("select * from data_ukur;")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "ops, ada kesalahan saat query data",
@@ -27,10 +27,7 @@ func GetData(c *gin.Context){
 	}
 	defer rows.Close()
 
-	c.JSON(http.StatusOK, gin.H{
-		"result": alldata,
-		"count":  len(alldata),
-	})
+	c.JSON(http.StatusOK, alldata)
 }
 
 func PostData(c *gin.Context) {
@@ -46,7 +43,7 @@ func PostData(c *gin.Context) {
 		return
 	}
 
-	masuk, err := conn.Prepare("insert into data_ukur (nama_data, filename, arus_injeksi, deskripsi) values(?,?,?, ?);")
+	masuk, err := db.Prepare("insert into data_ukur (nama_data, filename, arus_injeksi, deskripsi) values(?,?,?, ?);")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "ops, ada kesalahan saat query data",
@@ -93,7 +90,7 @@ func PutData(c *gin.Context) {
 		kueri = "update data_ukur set alamat_data=? where id_data=?;"
 	}
 
-	updt, err := conn.Prepare(kueri)
+	updt, err := db.Prepare(kueri)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "ops, ada kesalahan saat query data",
@@ -126,7 +123,7 @@ func DeleteData(c *gin.Context) {
 		return
 	}
 
-	dlt, err := conn.Prepare("delete from data_ukur where id_data=?;")
+	dlt, err := db.Prepare("delete from data_ukur where id_data=?;")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "ops, ada kesalahan saat query data",

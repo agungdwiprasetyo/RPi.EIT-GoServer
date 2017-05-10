@@ -12,7 +12,7 @@ func GetAlgor(c *gin.Context){
 		allAlgor []Algor
 	)
 
-	rows, err := conn.Query("select id_algor,nama_algor from algoritma;")
+	rows, err := db.Query("select id_algor,nama_algor from algoritma;")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "ops, ada kesalahan saat query data",
@@ -51,7 +51,7 @@ func PostAlgor(c *gin.Context) {
 		return
 	}
 
-	masuk, err := conn.Prepare("insert into algoritma (id_algor,nama_algor) values(?,?);")
+	masuk, err := db.Prepare("insert into algoritma (id_algor,nama_algor) values(?,?);")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "ops, ada kesalahan saat query data",
@@ -90,7 +90,7 @@ func DeleteAlgor(c *gin.Context) {
 		return
 	}
 
-	dlt, err := conn.Prepare("delete from algoritma where id_algor=?;")
+	dlt, err := db.Prepare("delete from algoritma where id_algor=?;")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "ops, ada kesalahan saat query data",

@@ -2,7 +2,6 @@ package models
 
 import (
 	"database/sql"
-	// "github.com/jinzhu/gorm"
 )
 
 type (
@@ -31,7 +30,8 @@ type (
 	}
 )
 
-var conn *sql.DB
-func SetDB(db *sql.DB){
-	conn = db
+var db *sql.DB
+
+func SetDB(conn *sql.DB){
+	db = conn
 }

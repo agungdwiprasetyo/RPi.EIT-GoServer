@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"github.com/gin-gonic/gin"
 
-	"./models"
 	"./routers"
 	"./database"
 )
@@ -15,18 +14,9 @@ func main() {
 	fmt.Println("---- Developed by Agung Dwi Prasetyo ----")
 	
 	// konek database
-	db, err := database.DB_Connect()
-	if err != nil {
-		fmt.Print(err.Error())
-	}
-	defer db.Close()
-	err = db.Ping()
-	if err != nil {
-		fmt.Print(err.Error())
-	}
+	database.Connect()
 
-	// init database
-	models.SetDB(db)
+	http.Handle("/", http.FileServer(http.Dir("./public")))
 
 	// routing API
 	router := gin.Default()
@@ -35,5 +25,4 @@ func main() {
 	routers.Algor(router)
 
 	router.Run(":3456")
-	http.Handle("/", http.FileServer(http.Dir("/public")))
 }

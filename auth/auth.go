@@ -35,7 +35,7 @@ func Authenticate(router *gin.Engine) {
 			claims["nama"] = login.Nama
 
 			// Expire in 30 menit
-			claims["exp"] = time.Now().Add(time.Minute * 10).Unix()
+			claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
 			tokenString, err := token.SignedString([]byte(SecretKey))
 			if err != nil {
 				return

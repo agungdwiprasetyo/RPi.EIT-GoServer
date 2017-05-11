@@ -7,6 +7,7 @@ import (
 
 	"./routers"
 	"./database"
+	"./auth"
 )
 
 func main() {
@@ -16,13 +17,15 @@ func main() {
 	// konek database
 	database.Connect()
 
-	http.Handle("/", http.FileServer(http.Dir("./public")))
-
 	// routing API
 	router := gin.Default()
+	auth.Authenticate(router)
+	
 	routers.Data(router)
 	routers.Image(router)
 	routers.Algor(router)
 
-	router.Run(":3456")
+	// router.Run(":3456")
+	http.Handle("/", http.FileServer(http.Dir("./public")))
+	http.ListenAndServe(":3456", router)
 }

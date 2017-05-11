@@ -34,10 +34,7 @@ func GetAlgor(c *gin.Context){
 	}
 	defer rows.Close()
 
-	c.JSON(http.StatusOK, gin.H{
-		"result": allAlgor,
-		"count":  len(allAlgor),
-	})
+	c.JSON(http.StatusOK, allAlgor)
 }
 
 func PostAlgor(c *gin.Context) {

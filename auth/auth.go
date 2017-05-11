@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"github.com/gin-gonic/gin"
 	"github.com/dgrijalva/jwt-go"
+
+	"../models"
 )
 
 const (
-	ValidUser = "Agung"
-	ValidPass = "fake"
 	SecretKey = "jancukkabeh"
 )
 
@@ -21,20 +21,29 @@ func Authenticate(router *gin.Engine) {
 	router.POST("/login", func(c *gin.Context) {
 		user := c.PostForm("username")
 		pass := c.PostForm("password")
-		if user==ValidUser && pass==ValidPass {
+		var (
+			login  models.Login
+		)
+
+		login = models.AuthLogin(user)
+
+		if pass==login.Password {
 			token := jwt.New(jwt.GetSigningMethod("HS256"))
 			claims := token.Claims.(jwt.MapClaims)
-			claims["userid"] = user
-			claims["tipe"] = "admin"
+			claims["userid"] = login.Username
+			claims["tipe"] = login.Tipe
+			claims["nama"] = login.Nama
 
 			// Expire in 30 menit
-			claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
+			claims["exp"] = time.Now().Add(time.Minute * 10).Unix()
 			tokenString, err := token.SignedString([]byte(SecretKey))
 			if err != nil {
 				return
 			}
 			c.JSON(http.StatusOK, gin.H{
-				"token": tokenString,	
+				"message": "login success",
+				"token": tokenString,
+				"user": claims,
 			})
 		}else {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -51,12 +60,13 @@ func Authenticate(router *gin.Engine) {
 		if err == nil && token.Valid {
 			claims := token.Claims.(jwt.MapClaims)
 			c.JSON(http.StatusOK, gin.H{
-				"userid": claims["userid"],
+				"username": claims["userid"],
 				"akses": claims["tipe"],
+				"nama": claims["nama"],
 			})
 		} else {
-			c.JSON(http.StatusOK, gin.H{
-				"message": "token invalid",
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "token invalid/expired",
 			})
 		}
 	})

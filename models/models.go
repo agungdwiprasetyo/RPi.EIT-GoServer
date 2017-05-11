@@ -30,8 +30,12 @@ type (
 	}
 
 	Login struct {
-		Username string `form:"username" json:"username" binding:"required"`
-		Password string `form:"password" json:"password" binding:"required"`
+		ID int `form:"id_user" json:"id_user"`
+		Tipe string `form:"tipe_user" json:"tipe_user"`
+		IDAlat string `form:"id_alat" json:"id_alat"`
+		Username string `form:"username" json:"username"`
+		Password string `form:"password" json:"password"`
+		Nama string `form:"nama" json:"nama"`
 	}
 )
 

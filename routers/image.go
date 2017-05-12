@@ -7,7 +7,7 @@ import (
 	"../models"
 )
 
-func Image(router *gin.Engine){
+func Image(router *gin.RouterGroup){
 	router.GET("/image", func(c *gin.Context) {
 		headToken := c.Request.Header.Get("token")
 

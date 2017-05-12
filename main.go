@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/static"
 
 	"./routers"
 	"./database"
@@ -11,21 +12,25 @@ import (
 )
 
 func main() {
-	fmt.Println("RESTful API written in Golang (dipecah dalam bentuk modul)")
+	fmt.Println("RESTful API / Back-End side written in Golang (dipecah dalam bentuk modul)")
 	fmt.Println("---- Developed by Agung Dwi Prasetyo ----")
 	
 	// konek database
 	database.Connect()
 
-	// routing API
+	// init router
 	router := gin.Default()
 	auth.Authenticate(router)
-	
-	routers.Data(router)
-	routers.Image(router)
-	routers.Algor(router)
 
-	// router.Run(":3456")
-	http.Handle("/", http.FileServer(http.Dir("./public")))
+	// routing API
+	api := router.Group("/api")
+	routers.Data(api)
+	routers.Image(api)
+	routers.Algor(api)
+
+	// serve static html Front-End side
+	router.Use(static.Serve("/", static.LocalFile("./frontend", true)))
+
+	// run server at port 3456
 	http.ListenAndServe(":3456", router)
 }

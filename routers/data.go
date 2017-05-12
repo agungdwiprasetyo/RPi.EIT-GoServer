@@ -7,7 +7,7 @@ import (
 	"../models"
 )
 
-func Data(router *gin.Engine){
+func Data(router *gin.RouterGroup){
 	router.GET("/data", func(c *gin.Context) {
 		headToken := c.Request.Header.Get("token")
 

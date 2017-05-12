@@ -7,7 +7,7 @@ import (
 	"../models"
 )
 
-func Algor(router *gin.Engine){
+func Algor(router *gin.RouterGroup){
 	router.GET("/algor", func(c *gin.Context) {
 		headToken := c.Request.Header.Get("token")
 

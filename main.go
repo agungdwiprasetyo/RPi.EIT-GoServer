@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"net/http"
+	// "net/http"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/static"
 
@@ -18,18 +18,18 @@ func main() {
 	// konek database
 	database.Connect()
 
-	// init router
+	// init app
 	app := gin.Default()
 
 	// otentikasi
 	auth.Authenticate(app)
 
-	// routing API
+	// init routing API
 	routers.InitAPI(app)
 
 	// serve static html Front-End side
 	app.Use(static.Serve("/", static.LocalFile("./frontend", true)))
 
 	// run server at port 3456
-	http.ListenAndServe(":3456", app)
+	app.Run(":3456")
 }

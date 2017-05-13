@@ -17,8 +17,8 @@ func GetSecretKey() string{
 	return SecretKey
 }
 
-func Authenticate(router *gin.Engine) {
-	router.POST("/login", func(c *gin.Context) {
+func Authenticate(app *gin.Engine) {
+	app.POST("/login", func(c *gin.Context) {
 		user := c.PostForm("username")
 		pass := c.PostForm("password")
 		var (
@@ -52,7 +52,7 @@ func Authenticate(router *gin.Engine) {
 		}
 	})
 
-	router.GET("/cek", func(c *gin.Context) {
+	app.GET("/cek", func(c *gin.Context) {
 		headToken := c.Request.Header.Get("token")
 		token, err := jwt.Parse(headToken, func(token *jwt.Token) (interface{}, error) {
 			return []byte(SecretKey), nil

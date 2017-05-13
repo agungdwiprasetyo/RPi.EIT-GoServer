@@ -19,18 +19,17 @@ func main() {
 	database.Connect()
 
 	// init router
-	router := gin.Default()
-	auth.Authenticate(router)
+	app := gin.Default()
+
+	// otentikasi
+	auth.Authenticate(app)
 
 	// routing API
-	api := router.Group("/api")
-	routers.Data(api)
-	routers.Image(api)
-	routers.Algor(api)
+	routers.InitAPI(app)
 
 	// serve static html Front-End side
-	router.Use(static.Serve("/", static.LocalFile("./frontend", true)))
+	app.Use(static.Serve("/", static.LocalFile("./frontend", true)))
 
 	// run server at port 3456
-	http.ListenAndServe(":3456", router)
+	http.ListenAndServe(":3456", app)
 }

@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	SecretKey = "jancukkabeh"
-	expireOffset = 1800
+	SecretKey = "backendserviceforelectricalimpedancetomography"
+	expireMinutes = 30
 )
 
 func GetSecretKey() string{
@@ -44,7 +44,7 @@ func Authenticate(app *gin.Engine) {
 			claims["nama"] = login.Nama
 
 			// Expire in 30 menit
-			claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
+			claims["exp"] = time.Now().Add(time.Minute * expireMinutes).Unix()
 			tokenString, err := token.SignedString([]byte(SecretKey))
 			if err != nil {
 				return
@@ -66,17 +66,15 @@ func Authenticate(app *gin.Engine) {
 		token, err := jwt.Parse(headToken, func(token *jwt.Token) (interface{}, error) {
 			return []byte(SecretKey), nil
 		})
+		// claims := token.Claims.(jwt.MapClaims)
 		if err == nil && token.Valid {
-			claims := token.Claims.(jwt.MapClaims)
 			c.JSON(http.StatusOK, gin.H{
-				"username": claims["userid"],
-				"akses": claims["tipe"],
-				"nama": claims["nama"],
-				"exp": claims["exp"],
+				"token": token,
 			})
 		} else {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"message": "token invalid/expired",
+				"token": token,
 			})
 		}
 	})
@@ -109,5 +107,5 @@ func GetRemainingToken(waktu interface{}) int{
 			return int(remainer.Seconds())
 		}
 	}
-	return expireOffset
+	return expireMinutes
 }

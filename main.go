@@ -8,6 +8,7 @@ import (
 
 	"./routers"
 	"./database"
+	// "./socket"
 	"./auth"
 )
 
@@ -19,7 +20,9 @@ func main() {
 	database.Connect()
 
 	// init app
-	app := gin.Default()
+	app := gin.New()
+	app.Use(gin.Logger())
+	app.Use(gin.Recovery())
 
 	// otentikasi
 	auth.Authenticate(app)

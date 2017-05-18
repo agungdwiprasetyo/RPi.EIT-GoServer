@@ -2,9 +2,12 @@ package auth
 
 import (
 	"time"
+	// "fmt"
+	"strings"
 	"net/http"
 	"github.com/gin-gonic/gin"
 	"github.com/dgrijalva/jwt-go"
+	"encoding/base64"
 
 	"../models"
 )
@@ -62,41 +65,63 @@ func Authenticate(app *gin.Engine) {
 	})
 
 	app.GET("/cek", func(c *gin.Context) {
-		headToken := c.Request.Header.Get("token")
-		token, err := jwt.Parse(headToken, func(token *jwt.Token) (interface{}, error) {
-			return []byte(SecretKey), nil
-		})
-		// claims := token.Claims.(jwt.MapClaims)
-		if err == nil && token.Valid {
+		checkToken := CheckAuthorization(c)
+		if checkToken {
 			c.JSON(http.StatusOK, gin.H{
-				"token": token,
-			})
-		} else {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "token invalid/expired",
-				"token": token,
+				"message" : "mantab, sukses",
 			})
 		}
+
 	})
 
 	app.GET("/logout", func(c *gin.Context) {
-		headToken := c.Request.Header.Get("token")
-		token, err := jwt.Parse(headToken, func(token *jwt.Token) (interface{}, error) {
-			return []byte(SecretKey), nil
-		})
-		if err == nil && token.Valid {
-			claims := token.Claims.(jwt.MapClaims)
-			rem := GetRemainingToken(claims["exp"])
+		valid := CheckAuthorization(c)
+		if valid {
 			c.JSON(http.StatusOK, gin.H{
-				"message": "logout sukses",
-				"exp": rem,
-			})
-		} else {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "token invalid/expired",
+				"message": "logout success",
 			})
 		}
 	})
+}
+
+func CheckAuthorization(c *gin.Context) bool{
+	authorization := c.Request.Header.Get("Authorization")
+	if(authorization==""){
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "no authorization",
+		})
+		return false
+	}
+
+	tmp1 := strings.Split(authorization," ") // hilangin string Basic
+
+	authDecode, _  := base64.StdEncoding.DecodeString(tmp1[1]) // decode authorization
+	basicAuth := string(authDecode[:])
+
+	tmp2 := strings.Split(basicAuth,":")
+	name := tmp2[0]
+	headToken := tmp2[1]
+
+	token, err := jwt.Parse(headToken, func(token *jwt.Token) (interface{}, error) {
+		return []byte(SecretKey), nil
+	})
+
+	if err!=nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "token invalid",
+		})
+		return false
+	}
+
+	claims := token.Claims.(jwt.MapClaims)
+	if token.Valid && name==claims["userid"] {
+		return true
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "token expired",
+		})
+		return false
+	}
 }
 
 func GetRemainingToken(waktu interface{}) int{

@@ -1,74 +1,24 @@
 package routers
 
 import (
-	"net/http"
 	"github.com/gin-gonic/gin"
-	"github.com/dgrijalva/jwt-go"
 	"../models"
 )
 
-func Image(router *gin.RouterGroup){
-	router.GET("/image", func(c *gin.Context) {
-		headToken := c.Request.Header.Get("token")
-
-		token, err := jwt.Parse(headToken, func(token *jwt.Token) (interface{}, error) {
-			return []byte(SecretKey), nil
-		})
-		if err == nil && token.Valid {
-			models.GetImage(c)
-
-		} else {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "token invalid",
-			})
-		}
+func Image(api *gin.RouterGroup){
+	api.GET("/image", func(c *gin.Context) {
+		models.GetImage(c)
 	})
 
-	router.POST("/image", func(c *gin.Context) {
-		headToken := c.Request.Header.Get("token")
-
-		token, err := jwt.Parse(headToken, func(token *jwt.Token) (interface{}, error) {
-			return []byte(SecretKey), nil
-		})
-		if err == nil && token.Valid {
-			models.PostImage(c)
-
-		} else {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "token invalid",
-			})
-		}
+	api.POST("/image", func(c *gin.Context) {
+		models.PostImage(c)
 	})
 
-	router.PUT("/image", func(c *gin.Context) {
-		headToken := c.Request.Header.Get("token")
-
-		token, err := jwt.Parse(headToken, func(token *jwt.Token) (interface{}, error) {
-			return []byte(SecretKey), nil
-		})
-		if err == nil && token.Valid {
-			models.PutImage(c)
-
-		} else {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "token invalid",
-			})
-		}
+	api.PUT("/image", func(c *gin.Context) {
+		models.PutImage(c)
 	})
 
-	router.DELETE("/image/:id", func(c *gin.Context) {
-		headToken := c.Request.Header.Get("token")
-
-		token, err := jwt.Parse(headToken, func(token *jwt.Token) (interface{}, error) {
-			return []byte(SecretKey), nil
-		})
-		if err == nil && token.Valid {
-			models.DeleteImage(c)
-
-		} else {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"message": "token invalid",
-			})
-		}
+	api.DELETE("/image/:id", func(c *gin.Context) {
+		models.DeleteImage(c)
 	})
 }

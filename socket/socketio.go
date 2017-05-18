@@ -1,19 +1,17 @@
 package socket
 
 import (
+	"fmt"
 	"github.com/googollee/go-socket.io"
 )
 
-var socket * socketio.Server
-
+func InitSocket() {
 	// init socket.io
-	// socket, errsock := socketio.NewServer(nil)
-	// if errsock != nil {
-	// 	fmt.Print(errsock)
-	// }
-
-func socketHandler(c *gin.Context) {
-	socket.On("connection", func(so socketio.Socket) {
+	socketIO, errsock := socketio.NewServer(nil)
+	if errsock != nil {
+		fmt.Println(errsock)
+	}
+	socketIO.On("connection", func(so socketio.Socket) {
 		fmt.Println("on connection")
 		so.Join("RPi.EIT")
 		so.On("runReconstruction", func(msg string) {
@@ -26,7 +24,7 @@ func socketHandler(c *gin.Context) {
 			fmt.Println("on disconnect")
 		})
 	})
-	socket.On("error", func(so socketio.Socket, errsock error) {
+	socketIO.On("error", func(so socketio.Socket, errsock error) {
 		fmt.Println("error:", errsock)
 	})
 }
